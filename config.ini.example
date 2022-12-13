@@ -1,0 +1,9 @@
+[TMDB]
+ApiKey=[TMDB-api-key]
+
+[Target Directories]
+BD=/home/user/Documents/Videos/BD
+DVD=/home/user/Documents/Videos/DVD
+
+[General]
+Kodi3DSuffix=.3d.mvc
