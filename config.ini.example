@@ -7,3 +7,4 @@ DVD=/home/user/Documents/Videos/DVD
 
 [General]
 Kodi3DSuffix=.3d.mvc
+SimilarFileSizeMargin=0.25
