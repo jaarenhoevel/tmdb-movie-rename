@@ -45,8 +45,8 @@ movieFiles = [f for f in files if f.endswith(('.mkv', '.mp4', '.avi', '.m4v'))]
 largestFile = max(movieFiles, key=lambda x: os.path.getsize(os.path.join(directory, x)))
 largestFileSize = os.path.getsize(os.path.join(directory, largestFile))
 
-# Check if there are any other files within 10% of the size of the largest file
-closeSizeFiles = [f for f in movieFiles if abs(os.path.getsize(os.path.join(directory, f)) - largestFileSize) / largestFileSize <= 0.1]
+# Check if there are any other files within selected margin of the size of the largest file
+closeSizeFiles = [f for f in movieFiles if abs(os.path.getsize(os.path.join(directory, f)) - largestFileSize) / largestFileSize <= float(config["General"]["SimilarFileSizeMargin"])]
 
 if len(closeSizeFiles) == 1:
     # Use largest file
@@ -60,8 +60,8 @@ else:
     print("Select a movie file:")
     for index, file in enumerate(movieFiles):
         fileSize = os.path.getsize(os.path.join(directory, file))
-        if abs(fileSize - largestFileSize) / largestFileSize <= 0.1:
-            # Highlight file if it is within 10% of the size of the largest file
+        if abs(fileSize - largestFileSize) / largestFileSize <= float(config["General"]["SimilarFileSizeMargin"]):
+            # Highlight file if it is within selected margin of the size of the largest file
             print(f'{index + 1} - {bcolors.OKGREEN}{file}{bcolors.ENDC} ({fileSize / 1024 / 1024 / 1024:.2f} GiB)')
         else:
             print(f'{index + 1} - {file} ({fileSize / 1024 / 1024 / 1024:.2f} GiB)')
@@ -79,7 +79,7 @@ search.movie(query=input(">>> "))
 
 # Print all results
 print("\nResults:")
-for index, movie in enumerate(search.results):
+for index, movie in enumerate(search.results):    
     print(f'{index + 1} - {movie["title"]} ({movie["release_date"][:4]})')
     print(f'{bcolors.OKGREEN}{movie["overview"]}{bcolors.ENDC}\n')
 
@@ -107,10 +107,10 @@ if correct == "n" or correct == "N":
 # Print target directories
 targetDirectories = []
 print("\n\nMove file to directory? [Skip]")
-for index, directory in enumerate(config["Target Directories"]):
-    print(f'{index + 1} - {directory.upper()}')
-    print(f'{bcolors.OKGREEN}{config["Target Directories"][directory]}{bcolors.ENDC}\n')
-    targetDirectories.append(config["Target Directories"][directory])
+for index, tDirectory in enumerate(config["Target Directories"]):
+    print(f'{index + 1} - {tDirectory.upper()}')
+    print(f'{bcolors.OKGREEN}{config["Target Directories"][tDirectory]}{bcolors.ENDC}\n')
+    targetDirectories.append(config["Target Directories"][tDirectory])
 
 targetDirectorySelection = input(">>> ")
 if targetDirectorySelection != "":
@@ -131,5 +131,5 @@ if confirm == "n" or confirm == "N":
     exit()
 
 print("\n\nRenaming file...")
-os.rename(movieFile, finalTarget)
+os.rename(directory + "/" + movieFile, finalTarget)
 print("Finished!")
