@@ -16,4 +16,4 @@ Install the dependencies via pip:
 Copy configuration example to `~/.config/tmdb-movie-rename/config.ini`, add TMDB api key and edit directories if needed.
 
 ## Usage:
-`python tmdb-movie-rename.py [movie-file]`
+`python tmdb-movie-rename.py [movie-folder]`
