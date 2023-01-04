@@ -1,4 +1,4 @@
-import os, sys, configparser, argparse
+import os, configparser, argparse
 import tmdbsimple as tmdb
 
 class bcolors:
@@ -13,17 +13,15 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 parser = argparse.ArgumentParser(description='Rename movie files with the help of TMDB database.')
-parser.add_argument('path', help='movie file to be renamed and moved')
+parser.add_argument('directory', help='Directory containing the movie file to be renamed and moved')
 
 args = parser.parse_args()
 
-# Check source file
-movieFile = args.path
-if not os.path.isfile(movieFile):
-    print("No such file.")
-    exit();
-
-movieFileExtension = os.path.splitext(movieFile)[1]
+# Check source directory
+directory = args.directory
+if not os.path.isdir(directory):
+    print("No such directory.")
+    exit()
 
 # Check for config in user config directory
 configFile = os.path.expanduser("~/.config/tmdb-movie-rename/config.ini")
@@ -36,6 +34,43 @@ config.read(configFile)
 
 # Set API key
 tmdb.API_KEY = config["TMDB"]["ApiKey"]
+
+# Get list of files in directory
+files = os.listdir(directory)
+
+# Filter out non-movie files
+movieFiles = [f for f in files if f.endswith(('.mkv', '.mp4', '.avi', '.m4v'))]
+
+## Check if there is a clear largest file
+largestFile = max(movieFiles, key=lambda x: os.path.getsize(os.path.join(directory, x)))
+largestFileSize = os.path.getsize(os.path.join(directory, largestFile))
+
+# Check if there are any other files within 10% of the size of the largest file
+closeSizeFiles = [f for f in movieFiles if abs(os.path.getsize(os.path.join(directory, f)) - largestFileSize) / largestFileSize <= 0.1]
+
+if len(closeSizeFiles) == 1:
+    # Use largest file
+    movieFile = largestFile
+    print(f'Selected file: {movieFile} ({largestFileSize / 1024 / 1024 / 1024:.2f} GiB)')
+else:
+    # Sort list of files by size
+    movieFiles.sort(key=lambda x: os.path.getsize(os.path.join(directory, x)), reverse=True)
+    
+    # Print list of files for user to select from
+    print("Select a movie file:")
+    for index, file in enumerate(movieFiles):
+        fileSize = os.path.getsize(os.path.join(directory, file))
+        if abs(fileSize - largestFileSize) / largestFileSize <= 0.1:
+            # Highlight file if it is within 10% of the size of the largest file
+            print(f'{index + 1} - {bcolors.OKGREEN}{file}{bcolors.ENDC} ({fileSize / 1024 / 1024 / 1024:.2f} GiB)')
+        else:
+            print(f'{index + 1} - {file} ({fileSize / 1024 / 1024 / 1024:.2f} GiB)')
+
+    selectedIndex = int(input(">>> ")) - 1
+    movieFile = movieFiles[selectedIndex]
+
+# Get movie file extension
+movieFileExtension = os.path.splitext(movieFile)[1]
 
 # Ask for movie name 
 print("Movie name:")
