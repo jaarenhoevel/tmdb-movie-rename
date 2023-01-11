@@ -1,4 +1,4 @@
-import os, configparser, argparse
+import os, configparser, argparse, subprocess
 import tmdbsimple as tmdb
 
 class bcolors:
@@ -132,4 +132,7 @@ if confirm == "n" or confirm == "N":
 
 print("\n\nRenaming file...")
 os.rename(directory + "/" + movieFile, finalTarget)
-print("Finished!")
+print("Finished! Running post command...\n")
+
+#print(config["General"]["PostCommand"])
+subprocess.call((config["General"]["PostCommand"]).split())
