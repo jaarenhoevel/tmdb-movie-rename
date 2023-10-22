@@ -132,7 +132,12 @@ if confirm == "n" or confirm == "N":
 
 print("\n\nRenaming file...")
 os.rename(directory + "/" + movieFile, finalTarget)
-print("Finished! Running post command...\n")
+
+print(f'\n\nRun post command? [Y/n]')
+confirm = input(">>> ")
+if confirm == "n" or confirm == "N":
+    print("Exiting...")
+    exit()
 
 #print(config["General"]["PostCommand"])
 subprocess.call((config["General"]["PostCommand"]).split())
